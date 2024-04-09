@@ -1,0 +1,12 @@
+CMakeFiles/*
+CMakeCache.txt
+cmake/stm32cubemx/Makefile
+cmake/stm32cubemx/CMakeFiles/progress.marks
+Makefile
+cmake_install.cmake
+compile_commands.json
+embOSTest.ioc
+embOSTest.map
+cmake/gcc-arm-none-eabi.cmake
+cmake/stm32cubemx/cmake_install.cmake
+cmake/stm32cubemx/CMakeFiles/CMakeDirectoryInformation.cmake
