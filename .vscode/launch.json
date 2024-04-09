@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "./embOS.elf",
+            "name": "Debug with ST-Link",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "both",
+            "servertype": "stlink",
+            "interface": "swd",
+            "v1": false,
+            "stlinkPath": "st-util",
+            "stm32cubeprogrammer": "/home/krzysztof/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI",
+            "armToolchainPath": "/home/krzysztof/toolchains/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin",
+            "device": "STM32F303RE"
+        }
+    ]
+}
