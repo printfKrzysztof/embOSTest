@@ -189,7 +189,9 @@ SECTIONS
     PROVIDE ( end = . );
     PROVIDE ( _end = . );
     . = . + _Min_Heap_Size;
+    __stack_start__ = .;
     . = . + _Min_Stack_Size;
+    __stack_end__ = .;
     . = ALIGN(8);
   } >RAM
 
