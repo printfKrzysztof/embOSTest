@@ -1,0 +1,83 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "CMake: configure",
+			"type": "shell",
+			"command": "cmake",
+			"args": [
+				"."
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build with Make",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"all",
+				"-j",
+				"8"
+			],
+			"dependsOn": "CMake: configure",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		}
+	]
+}{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "CMake: configure",
+			"type": "shell",
+			"command": "cmake",
+			"args": [
+				"."
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build with Make",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"all",
+				"-j",
+				"8"
+			],
+			"dependsOn": "CMake: configure",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		}
+	]
+}
