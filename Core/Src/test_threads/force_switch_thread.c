@@ -17,9 +17,10 @@ void forceSwitchThread(void const *argument)
 
     const uint8_t data = ((uint8_t *)argument)[0]; // Task number
     const int max = ((uint8_t *)argument)[1];      // Number of measurements per task
+
     while (!start_flag)
     {
-        osDelay(1);
+        osDelay(1); // Forcing task switch
     }
     int i = 0;
     while (1)

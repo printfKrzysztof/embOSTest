@@ -106,6 +106,7 @@ void mainThread(void const *argument)
                         }
                     }
 
+                    osDelay(1);
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
                     osDelay(10); // 10 milisecond block for main task
