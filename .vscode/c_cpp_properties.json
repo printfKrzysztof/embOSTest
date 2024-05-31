@@ -4,9 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/Core/Inc/**"
+                "${workspaceFolder}/Core/Inc/**",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F3xx/Include/**"
             ],
-            "defines": [],
+            "defines": [
+                "STM32F303xE"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "c++98",

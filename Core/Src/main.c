@@ -19,65 +19,30 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* Scheduler includes. */
+#include "cmsis_os.h"
 #include "RTOS.h"
-
+#include "threads_inc.h"
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
+// #define TESTING_BARE_METAL 1
 /* Private variables ---------------------------------------------------------*/
+osSemaphoreId semaphoreHandle;
+uint32_t values[MAX_THREADS][MAX_TEST_PER_THREAD];
+int start_flag;
+osThreadId defaultTaskHandle;
+osMessageQId queueHandle;
+TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart2;
-
-/* USER CODE BEGIN Declarations_Task0 */
-static OS_TASK TaskCB0;             // Control block for Task0
-static OS_STACKPTR int Stack0[128]; // Stack for Task0
-/* USER CODE END Declarations_Task0 */
-
-/* USER CODE BEGIN Declarations_Task1 */
-static OS_TASK TaskCB1;             // Control block for Task1
-static OS_STACKPTR int Stack1[128]; // Stack for Task1
-/* USER CODE END Declarations_Task1 */
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_TIM2_Init(void);
 
-/* USER CODE BEGIN Prototype_Task0 */
-static void Task0(void);
-/* USER CODE END Prototype_Task0 */
-
-/* USER CODE BEGIN Prototype_Task1 */
-static void Task1(void);
-/* USER CODE END Prototype_Task1 */
-
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
+void intToAscii(uint32_t num, char *buffer)
+{
+  sprintf(buffer, "%02d", num);
+}
 /* USER CODE END 0 */
 
 /**
@@ -87,56 +52,64 @@ static void Task1(void);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
+  MX_TIM2_Init();
+  HAL_TIM_Base_Start(&htim2);
+  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+#ifdef TESTING_BARE_METAL
+  __HAL_TIM_SET_COUNTER(&htim2, 0);
 
-  /* USER CODE END 2 */
+  int i = 0;
+  uint32_t time[101];
+  HAL_TIM_Base_Start(&htim2);
+  // First ten is to check how much does read take
 
-  /* Initialize the embOS kernel and configure the hardware parameters for embOS */
-  OS_Init();
-  OS_InitHW();
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
 
-  /* USER CODE BEGIN Creation_Task0 */
-  OS_TASK_Create(&TaskCB0, "Task0", 100, Task0, Stack0, sizeof(Stack0), 2); // Create Task0
-  /* USER CODE END Creation_Task0 */
-
-  /* USER CODE BEGIN Creation_Task1 */
-  OS_TASK_Create(&TaskCB1, "Task1", 100, Task1, Stack1, sizeof(Stack1), 2); // Create Task1
-  /* USER CODE END Creation_Task1 */
-
-  /* Start embOS */
-  OS_Start();
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+    time[i++] = __HAL_TIM_GetCounter(&htim2);
+    if (i == 100)
+      break;
   }
+
+  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  HAL_TIM_Base_Stop(&htim2);
+
+  char text[2];
+  for (int j = 0; j < i - 1; j++)
+  {
+    intToAscii(time[j + 1] - time[j], text);
+    HAL_UART_Transmit(&huart2, (uint8_t *)text, 2, 100);
+    HAL_UART_Transmit(&huart2, " ", 1, 100);
+  }
+
+#else
+  osKernelInitialize();
+  /* Initialize the embOS kernel and configure the hardware parameters for embOS */
+  osThreadDef(MainThread, mainThread, osPriorityNormal, 0, 256);
+  defaultTaskHandle = osThreadCreate(osThread(MainThread), NULL);
+
+  int a = osKernelStart();
+  exit(a);
+#endif // TESTING_BARE_METAL
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  // while (1)
+  // {
+  //   /* USER CODE END WHILE */
+
+  //   /* USER CODE BEGIN 3 */
+  // }
   /* USER CODE END 3 */
 }
 
@@ -217,6 +190,50 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+}
+
+/**
+ * @brief TIM2 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 0xFFFFFFFF; // Reset after ~ 59 s
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
 }
 
 /**

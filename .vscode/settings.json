@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "rtos.h": "c",
+        "threads_inc.h": "c",
+        "typeinfo": "c"
+    }
+}

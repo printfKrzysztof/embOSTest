@@ -2,24 +2,43 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "CMake: configure",
+			"label": "CMake: configure - Release",
 			"type": "shell",
 			"command": "cmake",
 			"args": [
+				"-DCMAKE_BUILD_TYPE=Release",
 				"."
 			],
 			"group": {
 				"kind": "build",
-				"isDefault": true
+				"isDefault": false
 			},
 			"presentation": {
-				"reveal": "always",
-				"panel": "new"
+				"reveal": "silent",
+				"panel": "shared"
 			},
 			"problemMatcher": []
 		},
 		{
-			"label": "Build with Make",
+			"label": "CMake: configure - Debug",
+			"type": "shell",
+			"command": "cmake",
+			"args": [
+				"-DCMAKE_BUILD_TYPE=Debug",
+				"."
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"presentation": {
+				"reveal": "silent",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build with Make - Release",
 			"type": "shell",
 			"command": "make",
 			"args": [
@@ -27,40 +46,19 @@
 				"-j",
 				"8"
 			],
-			"dependsOn": "CMake: configure",
+			"dependsOn": "CMake: configure - Release",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
 			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			},
-			"problemMatcher": []
-		}
-	]
-}{
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "CMake: configure",
-			"type": "shell",
-			"command": "cmake",
-			"args": [
-				"."
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
+				"reveal": "silent",
+				"panel": "shared"
 			},
 			"problemMatcher": []
 		},
 		{
-			"label": "Build with Make",
+			"label": "Build with Make - Debug",
 			"type": "shell",
 			"command": "make",
 			"args": [
@@ -68,14 +66,31 @@
 				"-j",
 				"8"
 			],
-			"dependsOn": "CMake: configure",
+			"dependsOn": "CMake: configure - Debug",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
 			"presentation": {
-				"reveal": "always",
-				"panel": "new"
+				"reveal": "silent",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Clean with Make",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"clean"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "silent",
+				"panel": "shared"
 			},
 			"problemMatcher": []
 		}
