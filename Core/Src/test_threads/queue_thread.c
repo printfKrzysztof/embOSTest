@@ -18,7 +18,7 @@ void queueTransmitterThread(void const *argument)
     const int max = ((uint8_t *)argument)[0]; // Number of measurements per task
     while (!start_flag)
     {
-        osThreadYield(); // Forcing task switch so lower priority has a chance to take context
+        osDelay(1); // Forcing task switch so lower priority has a chance to take context
     }
     osEvent evt;
     int i = 0;
@@ -42,7 +42,7 @@ void queueRecieverThread(void const *argument)
     const int max = ((uint8_t *)argument)[0]; // Number of measurements per task
     while (!start_flag)
     {
-        osThreadYield(); // Forcing task switch so lower priority has a chance to take context
+        osDelay(1); // Forcing task switch so lower priority has a chance to take context
     }
     osEvent evt;
     int i = 0;

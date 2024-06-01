@@ -10,3 +10,4 @@ embOSTest.map
 cmake/gcc-arm-none-eabi.cmake
 cmake/stm32cubemx/cmake_install.cmake
 cmake/stm32cubemx/CMakeFiles/CMakeDirectoryInformation.cmake
+embOSTest.elf

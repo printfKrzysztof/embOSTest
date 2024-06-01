@@ -19,7 +19,7 @@ void switchThread(void const *argument)
     const int max = ((uint8_t *)argument)[1];      // Number of measurements per task
     while (!start_flag)
     {
-        osThreadYield(); // Forcing task switch so lower priority has a chance to take context
+        osDelay(1); // Forcing task switch so lower priority has a chance to take context
     }
 
     int i = 0;
