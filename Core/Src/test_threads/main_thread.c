@@ -23,19 +23,8 @@ uint32_t os_thread_stack[80][(defalut_stack_size + 3) / 4];
 osThreadDef_t os_thread_def[80];
 OS_TASK os_thread_id[80];
 
-osThreadDef(ForceSwitchHigh, forceSwitchPriorityThread, osPriorityAboveNormal, 0, defalut_stack_size);
-osThreadDef(ForceSwitchLow, forceSwitchPriorityThread, osPriorityBelowNormal, 0, defalut_stack_size);
-
-osThreadDef(SwitchNormal, switchThread, osPriorityNormal, 0, defalut_stack_size);
-osThreadDef(SwitchHigh, switchPriorityThread, osPriorityAboveNormal, 0, defalut_stack_size);
-osThreadDef(SwitchLow, switchPriorityThread, osPriorityBelowNormal, 0, defalut_stack_size);
-
-osThreadDef(SemaphoreThread, semaphoreThread, osPriorityNormal, 0, defalut_stack_size);
 osSemaphoreDef(Semaphore);
-
-osThreadDef(QueueTransmitter, queueTransmitterThread, osPriorityNormal, 0, 128);
-osThreadDef(QueueReciever, queueRecieverThread, osPriorityNormal, 0, 128);
-osMessageQDef(Queue, 16, uint32_t);
+osMessageQDef(Queue, 100, uint32_t);
 
 void resetValues(uint8_t *buffer_tx, uint8_t *buffer_rx)
 {
@@ -143,10 +132,21 @@ void mainThread(void const *argument)
                     {
                         task_args[i][0] = i;
                         task_args[i][1] = args[2];
+                        os_thread_def[i].threadId = &os_thread_id[i];
+                        os_thread_def[i].pthread = (os_pthread)forceSwitchPriorityThread;
                         if (i < args[0])
-                            tasks[i] = osThreadCreate(osThread(ForceSwitchLow), task_args[i]);
+                            os_thread_def[i].tpriority = osPriorityBelowNormal;
                         else
-                            tasks[i] = osThreadCreate(osThread(ForceSwitchHigh), task_args[i]);
+                            os_thread_def[i].tpriority = osPriorityAboveNormal;
+                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                        os_thread_def[i].name = "ForceSwitchPriority";
+                        os_thread_def[i].stack = os_thread_stack[i];
+                        // Create the task
+                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
+                        if (tasks[i] == NULL)
+                        {
+                            // Handle error: Failed to create task
+                        }
                     }
 
                     HAL_TIM_Base_Start(&htim2);
@@ -183,7 +183,18 @@ void mainThread(void const *argument)
                     {
                         task_args[i][0] = i;
                         task_args[i][1] = args[1];
-                        tasks[i] = osThreadCreate(osThread(SwitchNormal), task_args[i]);
+                        os_thread_def[i].threadId = &os_thread_id[i];
+                        os_thread_def[i].pthread = (os_pthread)switchThread;
+                        os_thread_def[i].tpriority = osPriorityNormal;
+                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                        os_thread_def[i].name = "SwitchNormal";
+                        os_thread_def[i].stack = os_thread_stack[i];
+                        // Create the task
+                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
+                        if (tasks[i] == NULL)
+                        {
+                            // Handle error: Failed to create task
+                        }
                     }
 
                     HAL_TIM_Base_Start(&htim2);
@@ -221,10 +232,21 @@ void mainThread(void const *argument)
                     {
                         task_args[i][0] = i;
                         task_args[i][1] = args[2];
+                        os_thread_def[i].threadId = &os_thread_id[i];
+                        os_thread_def[i].pthread = (os_pthread)switchPriorityThread;
                         if (i < args[0])
-                            tasks[i] = osThreadCreate(osThread(SwitchLow), task_args[i]);
+                            os_thread_def[i].tpriority = osPriorityBelowNormal;
                         else
-                            tasks[i] = osThreadCreate(osThread(SwitchHigh), task_args[i]);
+                            os_thread_def[i].tpriority = osPriorityAboveNormal;
+                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                        os_thread_def[i].name = "SwitchPriority";
+                        os_thread_def[i].stack = os_thread_stack[i];
+                        // Create the task
+                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
+                        if (tasks[i] == NULL)
+                        {
+                            // Handle error: Failed to create task
+                        }
                     }
 
                     HAL_TIM_Base_Start(&htim2);
@@ -262,7 +284,18 @@ void mainThread(void const *argument)
                     {
                         task_args[i][0] = i;
                         task_args[i][1] = args[1];
-                        tasks[i] = osThreadCreate(osThread(SemaphoreThread), task_args[i]);
+                        os_thread_def[i].threadId = &os_thread_id[i];
+                        os_thread_def[i].pthread = (os_pthread)semaphoreThread;
+                        os_thread_def[i].tpriority = osPriorityNormal;
+                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                        os_thread_def[i].name = "SemaphoreThread";
+                        os_thread_def[i].stack = os_thread_stack[i];
+                        // Create the task
+                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
+                        if (tasks[i] == NULL)
+                        {
+                            // Handle error: Failed to create task
+                        }
                     }
 
                     HAL_TIM_Base_Start(&htim2);
@@ -297,8 +330,31 @@ void mainThread(void const *argument)
 
                     queueHandle = osMessageCreate(osMessageQ(Queue), NULL); // Creating bionary semaphore (mutex)
 
-                    tasks[0] = osThreadCreate(osThread(QueueTransmitter), args);
-                    tasks[1] = osThreadCreate(osThread(QueueReciever), args);
+                    os_thread_def[1].threadId = &os_thread_id[1];
+                    os_thread_def[1].pthread = (os_pthread)queueRecieverThread;
+                    os_thread_def[1].tpriority = osPriorityNormal;
+                    os_thread_def[1].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                    os_thread_def[1].name = "RecieverThread";
+                    os_thread_def[1].stack = os_thread_stack[1];
+                    // Create the task
+                    tasks[1] = osThreadCreate(&os_thread_def[1], args);
+                    if (tasks[1] == NULL)
+                    {
+                        // Handle error: Failed to create task
+                    }
+
+                    os_thread_def[0].threadId = &os_thread_id[0];
+                    os_thread_def[0].pthread = (os_pthread)queueTransmitterThread;
+                    os_thread_def[0].tpriority = osPriorityNormal;
+                    os_thread_def[0].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                    os_thread_def[0].name = "TransmitterThread";
+                    os_thread_def[0].stack = os_thread_stack[0];
+                    // Create the task
+                    tasks[0] = osThreadCreate(&os_thread_def[0], args);
+                    if (tasks[0] == NULL)
+                    {
+                        // Handle error: Failed to create task
+                    }
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
