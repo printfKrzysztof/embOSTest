@@ -2228,14 +2228,14 @@ extern "C"
     void (*pfSwitchToUnprivState)(void);
     void (*pfEnterPrivilegedState)(void);
     void (*pfLeavePrivilegedState)(void);
-    OS_U32 (*pfGetPrivilegedState)
+    OS_U32(*pfGetPrivilegedState)
     (void);
     void (*pfCallDeviceDriver)(OS_ROUTINE_VOID_PTR *pfRoutine, void *Param);
     void *(*pfSaveAll)(void *pStack);
     void *(*pfRestoreAll)(const void *pStack);
     void (*pfDeInit)(void);
 #ifdef OS_LIBMODE_SAFE
-    OS_BOOL (*pfSanityCheck)
+    OS_BOOL(*pfSanityCheck)
     (const OS_TASK *pTask);
 #endif
   } OS_MPU_API_LIST;
@@ -2675,7 +2675,7 @@ extern "C"
     void (*pfRecordU32x2)(unsigned int Id, OS_U32 Para0, OS_U32 Para1);
     void (*pfRecordU32x3)(unsigned int Id, OS_U32 Para0, OS_U32 Para1, OS_U32 Para2);
     void (*pfRecordU32x4)(unsigned int Id, OS_U32 Para0, OS_U32 Para1, OS_U32 Para2, OS_U32 Para3);
-    OS_U32 (*pfPtrToId)
+    OS_U32(*pfPtrToId)
     (OS_U32 Ptr);
     //
     // Additional Trace Event logging
