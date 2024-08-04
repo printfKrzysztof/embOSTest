@@ -28,8 +28,8 @@ extern "C"
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#define MAX_THREADS 100
-#define MAX_TEST_PER_THREAD 100
+#define MAX_THREADS 22
+#define MAX_TEST_PER_THREAD 80
 
 #include "stm32f3xx_hal.h"
 

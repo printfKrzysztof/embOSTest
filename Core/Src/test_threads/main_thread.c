@@ -76,7 +76,6 @@ void mainThread(void const *argument)
                     // Argument 2 - Number of measurements per task
 
                     uint8_t task_args[args[0]][2];
-                    memset(task_args, 0, sizeof(task_args));
                     for (size_t i = 0; i < args[0]; i++)
                     {
                         task_args[i][0] = i;
@@ -98,7 +97,7 @@ void mainThread(void const *argument)
                     osDelay(1);
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(10); // 10 milisecond block for main task
+                    osDelay(1000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
@@ -151,7 +150,7 @@ void mainThread(void const *argument)
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(10); // 10 milisecond block for main task
+                    osDelay(1000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
@@ -199,7 +198,7 @@ void mainThread(void const *argument)
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(1000); // 10 milisecond block for main task
+                    osDelay(5000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
@@ -251,7 +250,7 @@ void mainThread(void const *argument)
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(1000); // 10 milisecond block for main task
+                    osDelay(5000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
@@ -300,7 +299,7 @@ void mainThread(void const *argument)
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(10); // 10 milisecond block for main task
+                    osDelay(1000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
@@ -358,7 +357,7 @@ void mainThread(void const *argument)
 
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
-                    osDelay(10); // 10 milisecond block for main task
+                    osDelay(1000); // 10 milisecond block for main task
 
                     HAL_TIM_Base_Stop(&htim2);
 
