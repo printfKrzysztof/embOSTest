@@ -94,7 +94,7 @@ int main(void)
 #else
   osKernelInitialize();
   /* Initialize the embOS kernel and configure the hardware parameters for embOS */
-  osThreadDef(MainThread, mainThread, osPriorityNormal, 0, 1024);
+  osThreadDef(MainThread, mainThread, osPriorityNormal, 0, 2048);
   defaultTaskHandle = osThreadCreate(osThread(MainThread), NULL);
 
   int a = osKernelStart();
