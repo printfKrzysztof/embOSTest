@@ -376,6 +376,13 @@ void mainThread(void const *argument)
                         }
                         // osDelay(10);
                     }
+                    for (size_t i = 2; i < 4; i++) // For each task
+                    {
+                        if (CodeScoreFrame(buffer_tx, CMD_QUEUE, (uint16_t)(1), (uint8_t *)(values[i])) == 0)
+                        {
+                            HAL_UART_Transmit(&huart2, buffer_tx, SCORE_FRAME_SIZE, 1000);
+                        }
+                    }
                 }
                 break;
 

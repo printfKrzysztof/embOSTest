@@ -20,12 +20,14 @@ void queueTransmitterThread(void const *argument)
     {
         osDelay(1); // Forcing task switch so lower priority has a chance to take context
     }
-    osEvent evt;
     int i = 0;
     while (1)
     {
         values[0][i] = __HAL_TIM_GetCounter(&htim2);
-        osMessagePut(queueHandle, values[0][i++], osWaitForever);
+        while (osMessagePut(queueHandle, values[0][i++], osWaitForever) != osOK)
+        {
+            values[2][0]++;
+        }
         osThreadYield();
         if (i >= max)
             break;
@@ -54,8 +56,12 @@ void queueRecieverThread(void const *argument)
         if ((evt.status == osEventMessage) && (evt.value.v == values[0][i]))
         {
             values[1][i++] = __HAL_TIM_GetCounter(&htim2);
+            osThreadYield();
         }
-        osThreadYield();
+        else
+        {
+            values[3][0]++;
+        }
 
         if (i >= max)
             break;
