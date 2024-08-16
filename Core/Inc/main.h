@@ -38,7 +38,7 @@ extern "C"
   extern UART_HandleTypeDef huart2;
   extern TIM_HandleTypeDef htim2;
   extern uint32_t values[MAX_THREADS][MAX_TEST_PER_THREAD];
-  extern int start_flag;
+  extern volatile int start_flag;
 
   /* USER CODE END Includes */
 

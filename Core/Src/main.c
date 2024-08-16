@@ -22,12 +22,13 @@
 #include "cmsis_os.h"
 #include "RTOS.h"
 #include "threads_inc.h"
+#include <stdlib.h>
 /* Private includes ----------------------------------------------------------*/
 // #define TESTING_BARE_METAL 1
 /* Private variables ---------------------------------------------------------*/
-osSemaphoreId semaphoreHandle;
+osMutexId mutexHandle;
 uint32_t values[MAX_THREADS][MAX_TEST_PER_THREAD];
-int start_flag;
+volatile int start_flag;
 osThreadId defaultTaskHandle;
 osMessageQId queueHandle;
 TIM_HandleTypeDef htim2;

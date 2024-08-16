@@ -17,14 +17,11 @@
 // Threads definitions
 
 osThreadId tasks[MAX_THREADS];
-#define defalut_stack_size 156
+#define defalut_stack_size 255
 
 uint32_t os_thread_stack[80][(defalut_stack_size + 3) / 4];
 osThreadDef_t os_thread_def[80];
 OS_TASK os_thread_id[80];
-
-osSemaphoreDef(Semaphore);
-osMessageQDef(Queue, 100, uint32_t);
 
 void resetValues(uint8_t *buffer_tx, uint8_t *buffer_rx)
 {
@@ -55,6 +52,8 @@ void mainThread(void const *argument)
     (void)(argument);
     uint8_t buffer_rx[COMMAND_FRAME_SIZE];
     uint8_t buffer_tx[SCORE_FRAME_SIZE];
+    osMutexDef(Mutex);
+    osMessageQDef(Queue, 1, uint32_t);
     while (1)
     {
 
@@ -276,9 +275,8 @@ void mainThread(void const *argument)
 
                     // Argument 1 - Number of threads
                     // Argument 2 - Number of measurements per task
-
-                    uint8_t task_args[args[0]][2];
-                    semaphoreHandle = osSemaphoreCreate(osSemaphore(Semaphore), 1); // Creating bionary semaphore (mutex)
+                    uint8_t(*task_args)[2] = malloc(args[0] * sizeof(*task_args));
+                    mutexHandle = osMutexCreate(osMutex(Mutex)); // Creating bionary semaphore (mutex)
                     for (size_t i = 0; i < args[0]; i++)
                     {
                         task_args[i][0] = i;
@@ -298,6 +296,7 @@ void mainThread(void const *argument)
                     }
 
                     HAL_TIM_Base_Start(&htim2);
+                    free(task_args);
                     start_flag = 1;
                     osDelay(1000); // 10 milisecond block for main task
 
@@ -308,7 +307,7 @@ void mainThread(void const *argument)
                         osThreadTerminate(tasks[i]);
                     }
 
-                    osSemaphoreDelete(semaphoreHandle);
+                    osMutexDelete(mutexHandle);
 
                     for (size_t i = 0; i < args[0]; i++) // For each task
                     {
@@ -346,7 +345,7 @@ void mainThread(void const *argument)
                     os_thread_def[0].pthread = (os_pthread)queueTransmitterThread;
                     os_thread_def[0].tpriority = osPriorityNormal;
                     os_thread_def[0].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
-                    os_thread_def[0].name = "TransmitterThread";
+                    os_thread_def[0].name = (uint8_t *)"TransmitterThread";
                     os_thread_def[0].stack = os_thread_stack[0];
                     // Create the task
                     tasks[0] = osThreadCreate(&os_thread_def[0], args);

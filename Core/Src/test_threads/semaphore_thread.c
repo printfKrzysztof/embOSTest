@@ -24,13 +24,9 @@ void semaphoreThread(void const *argument)
     int i = 0;
     while (1)
     {
-        osSemaphoreWait(semaphoreHandle, osWaitForever);
+        osMutexWait(mutexHandle, osWaitForever);
         values[data][i++] = __HAL_TIM_GetCounter(&htim2);
-        osThreadYield(); // Forcing task switch
-
-        osSemaphoreRelease(semaphoreHandle);
-        values[data][i++] = __HAL_TIM_GetCounter(&htim2);
-        osThreadYield(); // Forcing task switch
+        osMutexRelease(mutexHandle);
 
         if (i == max)
             break;

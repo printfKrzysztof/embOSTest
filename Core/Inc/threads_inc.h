@@ -22,6 +22,6 @@ void semaphoreThread(void const *argument);
 void queueTransmitterThread(void const *argument);
 void queueRecieverThread(void const *argument);
 
-extern osSemaphoreId semaphoreHandle;
+extern osMutexId mutexHandle;
 extern osMessageQId queueHandle;
 #endif // THREADS_INC_H_

@@ -158,6 +158,7 @@ osStatus osDelay(uint32_t millisec)
 //
 osEvent osWait(uint32_t millisec)
 {
+    (void)(millisec);
     osEvent event;
     event.status = osOK;
     return event;
