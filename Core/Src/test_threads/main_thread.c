@@ -17,7 +17,7 @@
 // Threads definitions
 
 osThreadId tasks[MAX_THREADS];
-#define defalut_stack_size 255
+#define defalut_stack_size 512
 
 uint32_t os_thread_stack[80][(defalut_stack_size + 3) / 4];
 osThreadDef_t os_thread_def[80];
@@ -328,19 +328,6 @@ void mainThread(void const *argument)
 
                     queueHandle = osMessageCreate(osMessageQ(Queue), NULL); // Creating bionary semaphore (mutex)
 
-                    os_thread_def[1].threadId = &os_thread_id[1];
-                    os_thread_def[1].pthread = (os_pthread)queueRecieverThread;
-                    os_thread_def[1].tpriority = osPriorityNormal;
-                    os_thread_def[1].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
-                    os_thread_def[1].name = "RecieverThread";
-                    os_thread_def[1].stack = os_thread_stack[1];
-                    // Create the task
-                    tasks[1] = osThreadCreate(&os_thread_def[1], args);
-                    if (tasks[1] == NULL)
-                    {
-                        // Handle error: Failed to create task
-                    }
-
                     os_thread_def[0].threadId = &os_thread_id[0];
                     os_thread_def[0].pthread = (os_pthread)queueTransmitterThread;
                     os_thread_def[0].tpriority = osPriorityNormal;
@@ -350,6 +337,19 @@ void mainThread(void const *argument)
                     // Create the task
                     tasks[0] = osThreadCreate(&os_thread_def[0], args);
                     if (tasks[0] == NULL)
+                    {
+                        // Handle error: Failed to create task
+                    }
+
+                    os_thread_def[1].threadId = &os_thread_id[1];
+                    os_thread_def[1].pthread = (os_pthread)queueRecieverThread;
+                    os_thread_def[1].tpriority = osPriorityNormal;
+                    os_thread_def[1].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
+                    os_thread_def[1].name = "RecieverThread";
+                    os_thread_def[1].stack = os_thread_stack[1];
+                    // Create the task
+                    tasks[1] = osThreadCreate(&os_thread_def[1], args);
+                    if (tasks[1] == NULL)
                     {
                         // Handle error: Failed to create task
                     }

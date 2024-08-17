@@ -18,7 +18,7 @@ void queueTransmitterThread(void const *argument)
     const int max = ((uint8_t *)argument)[0]; // Number of measurements per task
     while (!start_flag)
     {
-        osDelay(1); // Forcing task switch so lower priority has a chance to take context
+        osThreadYield(); // Forcing task switch so lower priority has a chance to take context
     }
     int i = 0;
     while (1)
@@ -27,6 +27,7 @@ void queueTransmitterThread(void const *argument)
         while (osMessagePut(queueHandle, values[0][i++], osWaitForever) != osOK)
         {
             values[2][0]++;
+            osThreadYield();
         }
         osThreadYield();
         if (i >= max)
@@ -35,7 +36,7 @@ void queueTransmitterThread(void const *argument)
 
     while (1)
     {
-        osDelay(10); // Forcing delay so that main_thread has a chance to take context
+        osDelay(1000); // Forcing delay so that main_thread has a chance to take context
     }
 }
 
@@ -44,7 +45,7 @@ void queueRecieverThread(void const *argument)
     const int max = ((uint8_t *)argument)[0]; // Number of measurements per task
     while (!start_flag)
     {
-        osDelay(1); // Forcing task switch so lower priority has a chance to take context
+        osThreadYield(); // Forcing task switch so lower priority has a chance to take context
     }
     osEvent evt;
     int i = 0;
@@ -56,12 +57,12 @@ void queueRecieverThread(void const *argument)
         if ((evt.status == osEventMessage) && (evt.value.v == values[0][i]))
         {
             values[1][i++] = __HAL_TIM_GetCounter(&htim2);
-            osThreadYield();
         }
         else
         {
             values[3][0]++;
         }
+        osThreadYield();
 
         if (i >= max)
             break;
@@ -69,6 +70,6 @@ void queueRecieverThread(void const *argument)
 
     while (1)
     {
-        osDelay(10); // Forcing delay so that main_thread has a chance to take context
+        osDelay(1000); // Forcing delay so that main_thread has a chance to take context
     }
 }
