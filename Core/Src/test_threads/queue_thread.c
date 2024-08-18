@@ -24,11 +24,11 @@ void queueTransmitterThread(void const *argument)
     while (1)
     {
         values[0][i] = __HAL_TIM_GetCounter(&htim2);
-        while (osMessagePut(queueHandle, values[0][i++], osWaitForever) != osOK)
+        while (osMessagePut(queueHandle, values[0][i], osWaitForever) != osOK)
         {
             values[2][0]++;
-            osThreadYield();
         }
+        i++;
         osThreadYield();
         if (i >= max)
             break;
@@ -36,7 +36,7 @@ void queueTransmitterThread(void const *argument)
 
     while (1)
     {
-        osDelay(1000); // Forcing delay so that main_thread has a chance to take context
+        osDelay(10000); // Forcing delay so that main_thread has a chance to take context
     }
 }
 
@@ -57,12 +57,12 @@ void queueRecieverThread(void const *argument)
         if ((evt.status == osEventMessage) && (evt.value.v == values[0][i]))
         {
             values[1][i++] = __HAL_TIM_GetCounter(&htim2);
+            osThreadYield();
         }
         else
         {
             values[3][0]++;
         }
-        osThreadYield();
 
         if (i >= max)
             break;
@@ -70,6 +70,6 @@ void queueRecieverThread(void const *argument)
 
     while (1)
     {
-        osDelay(1000); // Forcing delay so that main_thread has a chance to take context
+        osDelay(10000); // Forcing delay so that main_thread has a chance to take context
     }
 }

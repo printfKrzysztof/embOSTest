@@ -19,9 +19,11 @@
 osThreadId tasks[MAX_THREADS];
 #define defalut_stack_size 512
 
-uint32_t os_thread_stack[80][(defalut_stack_size + 3) / 4];
-osThreadDef_t os_thread_def[80];
-OS_TASK os_thread_id[80];
+uint32_t os_thread_stack[MAX_THREADS][(defalut_stack_size + 3) / 4];
+osThreadDef_t os_thread_def[MAX_THREADS];
+OS_TASK os_thread_id[MAX_THREADS];
+osMutexDef(Mutex);
+osMessageQDef(Queue, 52, uint32_t);
 
 void resetValues(uint8_t *buffer_tx, uint8_t *buffer_rx)
 {
@@ -52,8 +54,7 @@ void mainThread(void const *argument)
     (void)(argument);
     uint8_t buffer_rx[COMMAND_FRAME_SIZE];
     uint8_t buffer_tx[SCORE_FRAME_SIZE];
-    osMutexDef(Mutex);
-    osMessageQDef(Queue, 1, uint32_t);
+
     while (1)
     {
 
@@ -191,10 +192,9 @@ void mainThread(void const *argument)
                     }
 
                     HAL_TIM_Base_Start(&htim2);
-                    free(task_args);
                     start_flag = 1;
                     osDelay(1000); // 10 milisecond block for main task
-
+                    free(task_args);
                     HAL_TIM_Base_Stop(&htim2);
 
                     for (size_t i = 0; i < args[0]; i++) // For each task
@@ -221,16 +221,17 @@ void mainThread(void const *argument)
 
                     // Argument 1 - Number of measurements per task
 
+                    volatile uint8_t task_args = args[0];
                     queueHandle = osMessageCreate(osMessageQ(Queue), NULL); // Creating bionary semaphore (mutex)
 
                     os_thread_def[0].threadId = &os_thread_id[0];
                     os_thread_def[0].pthread = (os_pthread)queueTransmitterThread;
                     os_thread_def[0].tpriority = osPriorityNormal;
                     os_thread_def[0].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
-                    os_thread_def[0].name = (uint8_t *)"TransmitterThread";
+                    os_thread_def[0].name = "TransmitterThread";
                     os_thread_def[0].stack = os_thread_stack[0];
                     // Create the task
-                    tasks[0] = osThreadCreate(&os_thread_def[0], args);
+                    tasks[0] = osThreadCreate(&os_thread_def[0], &task_args);
                     if (tasks[0] == NULL)
                     {
                         // Handle error: Failed to create task
@@ -243,7 +244,7 @@ void mainThread(void const *argument)
                     os_thread_def[1].name = "RecieverThread";
                     os_thread_def[1].stack = os_thread_stack[1];
                     // Create the task
-                    tasks[1] = osThreadCreate(&os_thread_def[1], args);
+                    tasks[1] = osThreadCreate(&os_thread_def[1], &task_args);
                     if (tasks[1] == NULL)
                     {
                         // Handle error: Failed to create task
@@ -252,7 +253,6 @@ void mainThread(void const *argument)
                     HAL_TIM_Base_Start(&htim2);
                     start_flag = 1;
                     osDelay(1000); // 10 milisecond block for main task
-
                     HAL_TIM_Base_Stop(&htim2);
 
                     for (size_t i = 0; i < 2; i++) // For each task
