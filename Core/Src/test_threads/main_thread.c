@@ -116,59 +116,6 @@ void mainThread(void const *argument)
                 }
                 break;
 
-                case CMD_TASK_FORCE_SWITCH_PRIORITY:
-
-                {
-                    resetValues(buffer_tx, buffer_rx); // Reseting all values
-
-                    // Argument 1 - Number of threads Low
-                    // Argument 2 - Number of threads High
-                    // Argument 3 - Number of measurements per task
-                    uint8_t task_count_sum = args[0] + args[1];
-                    uint8_t task_args[task_count_sum][2];
-                    for (size_t i = 0; i < task_count_sum; i++)
-                    {
-                        task_args[i][0] = i;
-                        task_args[i][1] = args[2];
-                        os_thread_def[i].threadId = &os_thread_id[i];
-                        os_thread_def[i].pthread = (os_pthread)forceSwitchPriorityThread;
-                        if (i < args[0])
-                            os_thread_def[i].tpriority = osPriorityBelowNormal;
-                        else
-                            os_thread_def[i].tpriority = osPriorityAboveNormal;
-                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
-                        os_thread_def[i].name = "ForceSwitchPriority";
-                        os_thread_def[i].stack = os_thread_stack[i];
-                        // Create the task
-                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
-                        if (tasks[i] == NULL)
-                        {
-                            // Handle error: Failed to create task
-                        }
-                    }
-
-                    HAL_TIM_Base_Start(&htim2);
-                    start_flag = 1;
-                    osDelay(1000); // 10 milisecond block for main task
-
-                    HAL_TIM_Base_Stop(&htim2);
-
-                    for (size_t i = 0; i < task_count_sum; i++) // For each task
-                    {
-                        osThreadTerminate(tasks[i]);
-                    }
-
-                    for (size_t i = 0; i < task_count_sum; i++) // For each task
-                    {
-                        if (CodeScoreFrame(buffer_tx, CMD_TASK_FORCE_SWITCH_PRIORITY, (uint16_t)(args[2] * 4), (uint8_t *)(values[i])) == 0)
-                        {
-                            HAL_UART_Transmit(&huart2, buffer_tx, SCORE_FRAME_SIZE, 1000);
-                        }
-                        // osDelay(10);
-                    }
-                }
-                break;
-
                 case CMD_TASK_SWITCH:
                 {
                     resetValues(buffer_tx, buffer_rx); // Reseting all values
@@ -209,58 +156,6 @@ void mainThread(void const *argument)
                     for (size_t i = 0; i < args[0]; i++) // For each task
                     {
                         if (CodeScoreFrame(buffer_tx, CMD_TASK_SWITCH, (uint16_t)(args[1] * 4), (uint8_t *)(values[i])) == 0)
-                        {
-                            HAL_UART_Transmit(&huart2, buffer_tx, SCORE_FRAME_SIZE, 1000);
-                        }
-                        // osDelay(10);
-                    }
-                }
-                break;
-
-                case CMD_TASK_SWITCH_PRIORITY:
-                {
-                    resetValues(buffer_tx, buffer_rx); // Reseting all values
-
-                    // Argument 1 - Number of threads Low
-                    // Argument 2 - Number of threads High
-                    // Argument 3 - Number of measurements per task
-                    uint8_t task_count_sum = args[0] + args[1];
-                    uint8_t task_args[task_count_sum][2];
-                    for (size_t i = 0; i < task_count_sum; i++)
-                    {
-                        task_args[i][0] = i;
-                        task_args[i][1] = args[2];
-                        os_thread_def[i].threadId = &os_thread_id[i];
-                        os_thread_def[i].pthread = (os_pthread)switchPriorityThread;
-                        if (i < args[0])
-                            os_thread_def[i].tpriority = osPriorityBelowNormal;
-                        else
-                            os_thread_def[i].tpriority = osPriorityAboveNormal;
-                        os_thread_def[i].stacksize = (defalut_stack_size + 3) / 4 * 4; // Align stack size
-                        os_thread_def[i].name = "SwitchPriority";
-                        os_thread_def[i].stack = os_thread_stack[i];
-                        // Create the task
-                        tasks[i] = osThreadCreate(&os_thread_def[i], task_args[i]);
-                        if (tasks[i] == NULL)
-                        {
-                            // Handle error: Failed to create task
-                        }
-                    }
-
-                    HAL_TIM_Base_Start(&htim2);
-                    start_flag = 1;
-                    osDelay(5000); // 10 milisecond block for main task
-
-                    HAL_TIM_Base_Stop(&htim2);
-
-                    for (size_t i = 0; i < task_count_sum; i++) // For each task
-                    {
-                        osThreadTerminate(tasks[i]);
-                    }
-
-                    for (size_t i = 0; i < task_count_sum; i++) // For each task
-                    {
-                        if (CodeScoreFrame(buffer_tx, CMD_TASK_SWITCH_PRIORITY, (uint16_t)(args[2] * 4), (uint8_t *)(values[i])) == 0)
                         {
                             HAL_UART_Transmit(&huart2, buffer_tx, SCORE_FRAME_SIZE, 1000);
                         }
@@ -375,6 +270,7 @@ void mainThread(void const *argument)
                         }
                         // osDelay(10);
                     }
+                    // Errors
                     for (size_t i = 2; i < 4; i++) // For each task
                     {
                         if (CodeScoreFrame(buffer_tx, CMD_QUEUE, (uint16_t)(1), (uint8_t *)(values[i])) == 0)

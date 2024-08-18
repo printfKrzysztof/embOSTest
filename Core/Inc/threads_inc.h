@@ -15,9 +15,7 @@
 
 void mainThread(void const *argument);
 void forceSwitchThread(void const *argument);
-void forceSwitchPriorityThread(void const *argument);
 void switchThread(void const *argument);
-void switchPriorityThread(void const *argument);
 void semaphoreThread(void const *argument);
 void queueTransmitterThread(void const *argument);
 void queueRecieverThread(void const *argument);

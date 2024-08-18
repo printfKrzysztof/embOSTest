@@ -42,7 +42,7 @@ static void MX_TIM2_Init(void);
 
 void intToAscii(uint32_t num, char *buffer)
 {
-  sprintf(buffer, "%02d", num);
+  sprintf(buffer, "%d", num);
 }
 /* USER CODE END 0 */
 
@@ -54,17 +54,24 @@ int main(void)
 {
 
   HAL_Init();
+
   SystemClock_Config();
+
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+
   MX_TIM2_Init();
+
   HAL_TIM_Base_Start(&htim2);
+
   HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
 #ifdef TESTING_BARE_METAL
+
   __HAL_TIM_SET_COUNTER(&htim2, 0);
 
   int i = 0;
-  uint32_t time[101];
+  uint32_t time[120];
   HAL_TIM_Base_Start(&htim2);
   // First ten is to check how much does read take
 
@@ -81,15 +88,29 @@ int main(void)
       break;
   }
 
-  time[i++] = __HAL_TIM_GetCounter(&htim2);
+  // for (int x = 0; x < 5; x++)
+  // {
+  //   time[i++] = __HAL_TIM_GetCounter(&htim2);
+  //   for (int j = 0; j < 12000; j++)
+  //   {
+  //     asm volatile("nop");
+  //   }
+  //   time[i++] = __HAL_TIM_GetCounter(&htim2);
+  // }
+
   HAL_TIM_Base_Stop(&htim2);
 
-  char text[2];
+  char text[10];
   for (int j = 0; j < i - 1; j++)
   {
     intToAscii(time[j + 1] - time[j], text);
-    HAL_UART_Transmit(&huart2, (uint8_t *)text, 2, 100);
+    HAL_UART_Transmit(&huart2, (uint8_t *)text, sizeof(text), 100);
     HAL_UART_Transmit(&huart2, " ", 1, 100);
+  }
+
+  while (1)
+  {
+    // Only if TESTING_BARE_METAL
   }
 
 #else
@@ -101,15 +122,6 @@ int main(void)
   int a = osKernelStart();
   exit(a);
 #endif // TESTING_BARE_METAL
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  // while (1)
-  // {
-  /* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
-  // }
-  /* USER CODE END 3 */
 }
 
 /**
@@ -276,38 +288,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Task0 */
-/**
- * @brief Function implementing Task0.
- * @retval None
- */
-void Task0(void)
-{
-  while (1)
-  {
-
-    char data[100] = "Hello world\n";
-    HAL_UART_Transmit(&huart2, data, strlen(data), 100);
-  }
-}
-/* USER CODE END Task0 */
-
-/* USER CODE BEGIN Task1 */
-/**
- * @brief Function implementing Task1.
- * @retval None
- */
-void Task1(void)
-{
-  while (1)
-  {
-    //
-    // Application code
-    //
-  }
-}
-/* USER CODE END Task1 */
 
 /**
  * @brief  Period elapsed callback in non blocking mode
