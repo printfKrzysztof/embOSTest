@@ -25,8 +25,8 @@ void semaphoreThread(void const *argument)
     while (1)
     {
         osMutexWait(mutexHandle, osWaitForever);
-        osThreadYield();
         values[data][i++] = __HAL_TIM_GetCounter(&htim2);
+        osThreadYield();
         osMutexRelease(mutexHandle);
 
         if (i == max)
