@@ -29,7 +29,7 @@ void switchThread(void const *argument)
     while (1)
     {
         temp = __HAL_TIM_GetCounter(&htim2);
-        if ((temp - values[data][i]) > 1000)
+        if ((temp - values[data][i]) > 300)
         {
             values[data][++i] = temp;
             values[data][++i] = temp;
